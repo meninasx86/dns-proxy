@@ -10,4 +10,4 @@ WORKDIR /dns-proxy
 ADD config ./
 ADD clean ./
 
-ENTRYPOINT ./config
+CMD ./config

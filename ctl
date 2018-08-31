@@ -2,6 +2,7 @@
 filename="$0"
 image="meninasx86/dns-proxy"
 version="test"
+container="dns-proxy"
 
 Usage(){
     echo "Usage: $filename <command> <attribute>"
@@ -22,7 +23,7 @@ START(){
     WAN=$1 
     DNSPORT=$2
 
-    docker run --rm -itd --cap-add=NET_ADMIN --network=host --privileged -e WAN=${WAN} -e DNSPORT=${DNSPORT} ${image}:${version}
+    docker run -itd --restart=always --cap-add=NET_ADMIN --network=host --name ${container} --privileged -e WAN=${WAN} -e DNSPORT=${DNSPORT} ${image}:${version} 
 }
 
 STOP(){
@@ -33,10 +34,12 @@ STOP(){
     WAN=$1 
     DNSPORT=$2
 
-    docker run --rm -itd --cap-add=NET_ADMIN --network=host --privileged -e WAN=${WAN} -e DNSPORT=${DNSPORT} --entrypoint="./clean" ${image}:${version}
+    docker exec -itd -e WAN=${WAN} -e DNSPORT=${DNSPORT} ${container} ./clean 
+    docker rm -f ${container}
 }
 
 STATUS(){
+    docker ps -a | grep ${container}
     sudo iptables -L -nv -t nat
 }
 
